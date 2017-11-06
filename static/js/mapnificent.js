@@ -42,6 +42,7 @@ MapnificentPosition.prototype.init = function(){
   this.marker.on('dragend', function(){
     self.updatePosition(self.marker.getLatLng());
   });
+
   this.startCalculation();
 };
 
@@ -275,7 +276,8 @@ MapnificentPosition.prototype.destroy = function(){
   this.redrawTime = 0;
 };
 
-function Mapnificent(map, city, pageConfig){
+function Mapnificent(map, city, pageConfig, coords){
+  this.coords = coords;
   this.map = map;
   this.positions = [];
   this.time = 60 * 10;
@@ -336,6 +338,14 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
+	  console.log("COORDS");
+	  console.log(self.coords);
+	 for (var i=0; i < self.coords.length; i++){
+		console.log(self.coords[i]);
+	  var marker = new L.Marker(self.coords[i], {opacity: 0.5});
+	  var popup = new L.Popup({minWidth: 50});
+	  marker.bindPopup(this.popup).addTo(self.map);
+	}
   });
 };
 

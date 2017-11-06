@@ -123,11 +123,20 @@ $(function(){
   map.attributionControl.setPrefix("");
   map.addLayer(defaultTileLayer);
 
+  var coords =[];
+
+  coords = [
+	  [50.025986, 14.491254],
+	  [50.021175, 14.453662]
+  ];
+
   var mapnificent = new Mapnificent(map, city, {
     baseurl: '{{ site.baseurl }}/'
-  });
+  }, coords);
 
   mapnificent.init();
+
+  console.log("Monguito");
 });
 
 </script>

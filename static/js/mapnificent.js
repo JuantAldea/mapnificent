@@ -351,8 +351,10 @@ Mapnificent.prototype.init = function(){
 			draggable: false, 
 			opacity: 0.5
 		});
-	  	var popup = new L.Popup({minWidth: 0});
-		popup.setContent("<a target='_blank' href='" + url + "'> link </a>");
+	  	var popup = new L.Popup({minWidth: 800});
+		var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
+		popup.setContent(preview);
+//		popup.setContent("<a target='_blank' href='" + url + "'> link </a>");
 		marker.bindPopup(popup).addTo(self.map);
 		marker.addTo(self.map);
 	}

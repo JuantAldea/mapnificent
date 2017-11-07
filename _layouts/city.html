@@ -131,13 +131,19 @@ $(function(){
   //console.log(estates_data);
   //mapnificent.add_estates(estates_data);
 
-  var url = "http://localhost:5000";
-  fetch(url)
-    .then(response => response.text())
-    .then(data => mapnificent.add_estates(JSON.parse(data)))
-    .catch(error => console.log('Error', error));
+  var url = "http://localhost:5000/";
+  var websites = [
+    "sreality",
+    "bezrealiky"
+   ];
 
-
+  for (var website in websites){
+    var request = url +  websites[website];
+    fetch(request)
+      .then(response => response.text())
+      .then(data => mapnificent.add_estates(JSON.parse(data)))
+      .catch(error => console.log('Error', error));  
+  }
 });
 
 </script>

@@ -276,8 +276,7 @@ MapnificentPosition.prototype.destroy = function(){
   this.redrawTime = 0;
 };
 
-function Mapnificent(map, city, pageConfig, estates){
-  this.estates = estates;
+function Mapnificent(map, city, pageConfig){
   this.map = map;
   this.positions = [];
   this.time = 60 * 10;
@@ -340,26 +339,26 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
-	 console.log(self.estates);
-	 console.log("--------------");
-	 for (var i in self.estates){
-		console.log(self.estates[i]);
-		var gps = self.estates[i]['gps'];
-		var url = self.estates[i]['url'];
-		var latlon = [gps['lat'], gps['lon']];
-	  	var marker = new L.Marker(latlon, {
-			draggable: false, 
-			opacity: 0.5
-		});
-	  	var popup = new L.Popup({minWidth: 800});
-		var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
-		popup.setContent(preview);
-//		popup.setContent("<a target='_blank' href='" + url + "'> link </a>");
-		marker.bindPopup(popup).addTo(self.map);
-		marker.addTo(self.map);
-	}
   });
 };
+
+Mapnificent.prototype.add_estates = function(estates) {
+  var self = this;
+  for (var i in estates) {
+    var gps = estates[i]['gps'];
+    var url = estates[i]['url'];
+    var latlon = [gps['lat'], gps['lon']];
+    var marker = new L.Marker(latlon, {
+      draggable: false, 
+      opacity: 0.5
+    });
+    var popup = new L.Popup({minWidth: 800});
+    var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
+    popup.setContent(preview);
+    marker.bindPopup(popup).addTo(self.map);
+    marker.addTo(self.map);
+  }
+}
 
 Mapnificent.prototype.logDebugMessage = function(latlng) {
   var self = this;

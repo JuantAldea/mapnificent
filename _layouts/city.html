@@ -123,26 +123,20 @@ $(function(){
   map.attributionControl.setPrefix("");
   map.addLayer(defaultTileLayer);
 
-  var coords =[];
-
-  console.log(estates_data);
-  for(var i in estates_data){
-	console.log(estates_data[i]);
-	coords.push([estates_data[i]['gps']['lat'], estates_data[i]['gps']['lon']]);
-  }
-
-/*
-  coords = [
-	  [50.025986, 14.491254],
-	  [50.021175, 14.453662]
-  ];
-*/
- console.log(coords);
   var mapnificent = new Mapnificent(map, city, {
     baseurl: '{{ site.baseurl }}/'
-  }, estates_data);
+  });
 
   mapnificent.init();
+  //console.log(estates_data);
+  //mapnificent.add_estates(estates_data);
+
+  var url = "http://localhost:5000";
+  fetch(url)
+    .then(response => response.text())
+    .then(data => mapnificent.add_estates(JSON.parse(data)))
+    .catch(error => console.log('Error', error));
+
 
 });
 

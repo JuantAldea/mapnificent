@@ -96,7 +96,7 @@ layout: base
 <script src="{{ site.baseurl }}/static/vendor/protobuf/dist/ProtoBuf.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ site.baseurl }}/static/js/quadtree.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ site.baseurl }}/static/js/mapnificent.js" type="text/javascript" charset="utf-8"></script>
-
+<script type="text/javascript" src="{{ site.baseurl }}/data.json"></script>
 <script>
 
 $(function(){
@@ -125,18 +125,25 @@ $(function(){
 
   var coords =[];
 
+  console.log(estates_data);
+  for(var i in estates_data){
+	console.log(estates_data[i]);
+	coords.push([estates_data[i]['gps']['lat'], estates_data[i]['gps']['lon']]);
+  }
+
+/*
   coords = [
 	  [50.025986, 14.491254],
 	  [50.021175, 14.453662]
   ];
-
+*/
+ console.log(coords);
   var mapnificent = new Mapnificent(map, city, {
     baseurl: '{{ site.baseurl }}/'
-  }, coords);
+  }, estates_data);
 
   mapnificent.init();
 
-  console.log("Monguito");
 });
 
 </script>

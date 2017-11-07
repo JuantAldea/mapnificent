@@ -31,7 +31,7 @@ MapnificentPosition.prototype.init = function(){
 
   this.marker = new L.Marker(this.latlng, {
     draggable: true,
-    opacity: 0.5
+    opacity: 0.05
   });
   this.popup = new L.Popup({
     minWidth: 200
@@ -276,8 +276,8 @@ MapnificentPosition.prototype.destroy = function(){
   this.redrawTime = 0;
 };
 
-function Mapnificent(map, city, pageConfig, coords){
-  this.coords = coords;
+function Mapnificent(map, city, pageConfig, estates){
+  this.estates = estates;
   this.map = map;
   this.positions = [];
   this.time = 60 * 10;
@@ -320,9 +320,11 @@ Mapnificent.prototype.init = function(){
 
     self.canvasTileLayer.drawTile = self.drawTile();
     self.map.addLayer(self.canvasTileLayer);
-    self.map.on('click', function(e) {
+/* 
+   self.map.on('click', function(e) {
         self.addPosition(e.latlng);
     });
+*/
     self.map.on('contextmenu', function(e) {
       if (self.settings.debug) {
         self.logDebugMessage(e.latlng);
@@ -338,13 +340,21 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
-	  console.log("COORDS");
-	  console.log(self.coords);
-	 for (var i=0; i < self.coords.length; i++){
-		console.log(self.coords[i]);
-	  var marker = new L.Marker(self.coords[i], {opacity: 0.5});
-	  var popup = new L.Popup({minWidth: 50});
-	  marker.bindPopup(this.popup).addTo(self.map);
+	 console.log(self.estates);
+	 console.log("--------------");
+	 for (var i in self.estates){
+		console.log(self.estates[i]);
+		var gps = self.estates[i]['gps'];
+		var url = self.estates[i]['url'];
+		var latlon = [gps['lat'], gps['lon']];
+	  	var marker = new L.Marker(latlon, {
+			draggable: false, 
+			opacity: 0.5
+		});
+	  	var popup = new L.Popup({minWidth: 0});
+		popup.setContent("<a target='_blank' href='" + url + "'> link </a>");
+		marker.bindPopup(popup).addTo(self.map);
+		marker.addTo(self.map);
 	}
   });
 };

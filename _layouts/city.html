@@ -119,42 +119,18 @@ $(function(){
 
   defaultTileLayer = new L.TileLayer(tileUrl, {
     maxZoom: 17, minZoom: 4,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'});
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+  });
+  
   map.attributionControl.setPrefix("");
   map.addLayer(defaultTileLayer);
 
   var mapnificent = new Mapnificent(map, city, {
     baseurl: '{{ site.baseurl }}/'
   });
-  var data = {"0": {"gps": {"lat": 55.072716, "lon": 14.493758}, "url": "https://www.sreality.cz/en/detail/sale/flat/2+1/praha-strasnice-ulice-v-olsinach/1020989788"}};
-  console.log("ASD");
+  
   mapnificent.init();
-/*
-  mapnificent.init().done(function(d){
-	console.log("MUGRE");
-	console.log(mapnificent);
-	mapnificent.add_estates(data);
-  });
-*/
-  console.log("DDD");
-  //console.log(estates_data);
-  //mapnificent.add_estates(estates_data);
 
-  var url = "http://localhost:5000/";
-  var websites = [
-//    "sreality"
-    //"bezrealiky"
-   ];
-/*
-  for (var website in websites){
-    var request = url +  websites[website];
-    console.log(request);
-    fetch(request)
-      .then(response => response.text())
-      .then(data => mapnificent.add_estates(JSON.parse(data)))
-      .catch(error => console.log('Error', error));  
-  }
-*/
 });
 
 </script>

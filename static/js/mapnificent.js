@@ -232,7 +232,7 @@ MapnificentPosition.prototype.getReachableStations = function(stationsAround, st
     var radius = Math.max(Math.round(lpoint.x - point2.x), 1);
 
     var p = self.mapnificent.map.project(point);
-//	console.log("point:", point, lngRadius);
+//  console.log("point:", point, lngRadius);
     var x = Math.round(p.x - start.x);
     var y = Math.round(p.y - start.y);
     if (x + radius < 0 || x - radius > tileSize ||
@@ -344,20 +344,20 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
-	console.log("LOAD DATA FINISHED");
+  console.log("Mapnificent.prototype.init FINISHED");
   });
 };
 
 Mapnificent.prototype.signal_done = function() {
 console.log("SIGNAL_DONE");
- var self = this;
+  var self = this
   var url = "http://localhost:5000/";
   var websites = [
     "sreality",
-  //  "bezrealiky"
-   ];
- var data = {"0": {"gps": {"lat": 55.072716, "lon": 14.493758}, "url": "https://www.sreality.cz/en/detail/sale/flat/2+1/praha-strasnice-ulice-v-olsinach/1020989788"}};
-data = {};
+    //"bezrealiky"
+  ];
+  var data = {"0": {"gps": {"lat": 55.072716, "lon": 14.493758}, "url": "https://www.sreality.cz/en/detail/sale/flat/2+1/praha-strasnice-ulice-v-olsinach/1020989788"}};
+  data = {};
   for (var website in websites){
     var request = url +  websites[website];
     fetch(request)
@@ -368,28 +368,31 @@ data = {};
 }
 
 Mapnificent.prototype.add_estates = function(estates) {
+
+  var old_time = new Date();
   var self = this;
   for (var i in estates) {
     var gps = estates[i]['gps'];
     var url = estates[i]['url'];
     var latlon = [gps['lat'], gps['lon']];
     for (var i in self.circles) {
-	var circle = self.circles[i];
-	var distance = self.quadtree.distanceBetweenCoordinates(latlon[0], latlon[1], circle[0], circle[1]);
-	if(distance <= circle[2]){
-		var marker = new L.Marker(latlon, {
-		      draggable: false, 
-		      opacity: 0.5
-		});
-	    var popup = new L.Popup({minWidth: 800});
-	    var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
-	    popup.setContent(preview);
-	    marker.bindPopup(popup).addTo(self.map);
-	    marker.addTo(self.map);
-	    break
-	}
-     }
-   }
+      var circle = self.circles[i];
+      var distance = self.quadtree.distanceBetweenCoordinates(latlon[0], latlon[1], circle[0], circle[1]);
+      if(distance <= circle[2]){
+        var marker = new L.Marker(latlon, {
+          draggable: false, 
+          opacity: 0.5
+        });
+        var popup = new L.Popup({minWidth: 800});
+        var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
+        popup.setContent(preview);
+        marker.bindPopup(popup).addTo(self.map);
+        marker.addTo(self.map);
+        break;
+      }
+    }
+  }
+  console.log("Time: ", new Date() - old_time);
 }
 
 Mapnificent.prototype.logDebugMessage = function(latlng) {
@@ -578,7 +581,7 @@ Mapnificent.prototype.drawTile = function() {
         ctx.arc(drawStations[j].x, drawStations[j].y,
                 drawStations[j].r, 0, 2 * Math.PI, false);
         ctx.fill();
-	self.circles.push([drawStations[j].lat, drawStations[j].lng, drawStations[j].radius_m]);
+  self.circles.push([drawStations[j].lat, drawStations[j].lng, drawStations[j].radius_m]);
       }
     }
   };

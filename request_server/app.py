@@ -3,45 +3,45 @@ from flask_cors import CORS
 import json
 import requests
 from beaker.cache import CacheManager
-
+from pprint import pprint as pp
 cache = CacheManager()
 app = Flask(__name__)
 CORS(app)
+sreality_url = "https://www.sreality.cz/api/en/v2/estates?"\
+"building_condition=1|2|6|9"\
+"&category_main_cb=1"\
+"&category_sub_cb=3|4|5|6|7"\
+"&category_type_cb=2"\
+"&czk_price_summary_order2=0|20000"\
+"&locality_district_id=5001|5002|5003|5004|5005|5006|5007|5008|5009|5010"\
+"&locality_region_id=10"\
+"&per_page=999"\
+"&usable_area=40|10000000000"
+#"&furnished=1"\
 
 @app.route("/sreality")
 @cache.cache("sreality", expire=300)
 def sreality():
-    url="""https://www.sreality.cz/api/en/v2/estates? \
-    building_condition=1|2|6|9\
-    &category_main_cb=1\
-    &category_sub_cb=3|4|5|6|7\
-    &category_type_cb=2\
-    &czk_price_summary_order2=0|20000\
-    &furnished=1\
-    &locality_district_id=5010|5009|5008|5005|5006|5007|5004|5003|5001|5002\
-    &locality_region_id=10\
-    &per_page=800\
-    &tms=1510013276202\
-    &usable_area=40|10000000000"""
-    url = "https://www.sreality.cz/api/en/v2/estates?building_condition=1%7C2%7C6%7C9&category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5%7C6%7C7&category_type_cb=2&czk_price_summary_order2=0%7C20000&locality_district_id=5001%7C5002%7C5004%7C5003%7C5005%7C5006%7C5007%7C5008%7C5009%7C5010&locality_region_id=10&per_page=999&tms=1510159751265&usable_area=45%7C10000000000"
-    response = requests.get(url)
+    print(sreality_url)
+    #url = "https://www.sreality.cz/api/en/v2/estates?building_condition=1%7C2%7C6%7C9&category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5%7C6%7C7&category_type_cb=2&czk_price_summary_order2=0%7C20000&locality_district_id=5001%7C5002%7C5004%7C5003%7C5005%7C5006%7C5007%7C5008%7C5009%7C5010&locality_region_id=10&per_page=999&tms=1510159751265&usable_area=45%7C10000000000"
+    response = requests.get(sreality_url)
     json_response = response.json()
     urlmap = json.loads(open("urlmap.json").read())
-    json_results = {}
+    results = []
     print(len(json_response['_embedded']['estates']))
-    for idx, estate in enumerate(json_response['_embedded']['estates']):
+    for estate in json_response['_embedded']['estates']:
         seo = estate['seo']
         estate_id = estate["hash_id"]
         gps = estate["gps"]
-        
         estate_url = "https://www.sreality.cz/en/detail/{}/{}/{}/{}/{}".format( \
             urlmap["category_type_cb_detail"][str(seo["category_type_cb"])], \
             urlmap["category_main_cb_detail"][str(seo["category_main_cb"])], \
             urlmap["category_sub_cb"][str(seo["category_sub_cb"])], \
             seo["locality"], \
             estate_id)
-        json_results[str(idx)]={"url": estate_url, "gps": gps}
-    return jsonify(json_results)
+        results.append({"url": estate_url, "gps": gps})
+        results = sorted(results, key= lambda x: x['gps']['lat'])
+    return jsonify(results)
 
 
 @app.route("/bezrealiky")

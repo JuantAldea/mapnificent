@@ -121,12 +121,16 @@ $(function(){
     maxZoom: 17, minZoom: 4,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
   });
+
+  
   
   map.attributionControl.setPrefix("");
   map.addLayer(defaultTileLayer);
+  //var cities_layer = new L.layerGroup();
+  //map.addControl(L.control.layers({}, {"Estates": cities_layer}));
 
   var mapnificent = new Mapnificent(map, city, {
-    baseurl: '{{ site.baseurl }}/'
+    baseurl: '{{ site.baseurl }}/',
   });
   
   mapnificent.init();

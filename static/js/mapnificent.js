@@ -72,6 +72,7 @@ MapnificentPosition.prototype.updatePosition = function(latlng, time){
   }
   if (needsRedraw || needsRecalc) {
     this.mapnificent.triggerHashUpdate();
+    this.mapnificent.signal_done();
   }
 };
 
@@ -306,6 +307,7 @@ function Mapnificent(map, city, pageConfig){
 Mapnificent.prototype.init = function(){
   var self = this, t0;
   self.tilesLoading = false;
+  
   return this.loadData().done(function(data){
     self.prepareData(data);
     self.canvasTileLayer = L.tileLayer.canvas();
@@ -324,6 +326,7 @@ Mapnificent.prototype.init = function(){
 
     self.canvasTileLayer.drawTile = self.drawTile();
     self.map.addLayer(self.canvasTileLayer);
+    
 /* 
    self.map.on('click', function(e) {
         self.addPosition(e.latlng);
@@ -344,7 +347,8 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
-  console.log("Mapnificent.prototype.init FINISHED");
+    
+    console.log("Mapnificent.prototype.init FINISHED");
   });
 };
 
@@ -352,12 +356,11 @@ Mapnificent.prototype.signal_done = function() {
 console.log("SIGNAL_DONE");
   var self = this
   var url = "http://localhost:5000/";
+  
   var websites = [
     "sreality",
     //"bezrealiky"
   ];
-  var data = {"0": {"gps": {"lat": 55.072716, "lon": 14.493758}, "url": "https://www.sreality.cz/en/detail/sale/flat/2+1/praha-strasnice-ulice-v-olsinach/1020989788"}};
-  data = {};
   for (var website in websites){
     var request = url +  websites[website];
     fetch(request)
@@ -368,9 +371,9 @@ console.log("SIGNAL_DONE");
 }
 
 Mapnificent.prototype.add_estates = function(estates) {
-
   var old_time = new Date();
   var self = this;
+  console.log(estates.length);
   for (var i in estates) {
     var gps = estates[i]['gps'];
     var url = estates[i]['url'];
@@ -387,11 +390,12 @@ Mapnificent.prototype.add_estates = function(estates) {
         var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
         popup.setContent(preview);
         marker.bindPopup(popup).addTo(self.map);
-        marker.addTo(self.map);
+        //self.cities_layer.addLayer(marker);
         break;
       }
     }
   }
+  self.circles = [];
   console.log("Time: ", new Date() - old_time);
 }
 
@@ -501,7 +505,6 @@ Mapnificent.prototype.prepareData = function(data) {
     this.settings.bounds[2], this.settings.bounds[3]
   );
   this.quadtree.insertAll(this.stationList);
- console.log(this.quadtree);
 };
 
 Mapnificent.prototype.redraw = function(){
@@ -581,7 +584,7 @@ Mapnificent.prototype.drawTile = function() {
         ctx.arc(drawStations[j].x, drawStations[j].y,
                 drawStations[j].r, 0, 2 * Math.PI, false);
         ctx.fill();
-  self.circles.push([drawStations[j].lat, drawStations[j].lng, drawStations[j].radius_m]);
+        self.circles.push([drawStations[j].lat, drawStations[j].lng, drawStations[j].radius_m]);
       }
     }
   };

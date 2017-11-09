@@ -1,11 +1,15 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify
 from flask_cors import CORS
 import json
 import requests
-import urllib
+from beaker.cache import CacheManager
+
+cache = CacheManager()
 app = Flask(__name__)
 CORS(app)
+
 @app.route("/sreality")
+@cache.cache("sreality", expire=300)
 def sreality():
     url="""https://www.sreality.cz/api/en/v2/estates? \
     building_condition=1|2|6|9\
@@ -37,10 +41,11 @@ def sreality():
             seo["locality"], \
             estate_id)
         json_results[str(idx)]={"url": estate_url, "gps": gps}
-    return  jsonify(json_results)
+    return jsonify(json_results)
 
 
 @app.route("/bezrealiky")
+@cache.cache("bezrealiky", expire=300)
 def bezrealiky():
     headers = {
         'Pragma': 'no-cache',
@@ -64,9 +69,10 @@ def bezrealiky():
         estate_url = "https://www.bezrealitky.cz/{}".format(estates[idx]['url'])
         estate_gps = {'lat': estates[idx]['lat'], 'lon' : estates[idx]['lng']}
         json_results[str(idx)] = {"url": estate_url, "gps" : estate_gps}
-    return  jsonify(json_results)
+    return jsonify(json_results)
 
 
 if __name__ == "__main__":
-    app.run()
+
+    app.run(debug=True)
 

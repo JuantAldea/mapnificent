@@ -2,3 +2,7 @@ _site/
 static/vendor/
 .bundle/
 vendor/
+.jekyll-metadata 
+*.swp
+*.pyc
+

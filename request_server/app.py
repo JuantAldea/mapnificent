@@ -15,7 +15,7 @@ sreality_url = "https://www.sreality.cz/api/en/v2/estates?"\
 "&czk_price_summary_order2=0|20000"\
 "&locality_district_id=5001|5002|5003|5004|5005|5006|5007|5008|5009|5010"\
 "&locality_region_id=10"\
-"&per_page=999"\
+"&per_page=10"\
 "&usable_area=40|10000000000"
 #"&furnished=1"\
 

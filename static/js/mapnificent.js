@@ -68,11 +68,11 @@ MapnificentPosition.prototype.updatePosition = function(latlng, time){
   }
   if (needsRedraw) {
     this.mapnificent.redraw();
-    this.mapnificent.signal_done();
+    //this.mapnificent.signal_done();
   }
   if (needsRedraw || needsRecalc) {
     this.mapnificent.triggerHashUpdate();
-    this.mapnificent.signal_done();
+    this.mapnificent.remove_estates();
   }
 };
 
@@ -111,7 +111,7 @@ MapnificentPosition.prototype.setTime = function(time) {
     this.time = time;
     this.mapnificent.redraw();
     this.mapnificent.triggerHashUpdate();
-    this.mapnificent.signal_done();
+    //this.mapnificent.signal_done();
   }
 };
 
@@ -174,7 +174,7 @@ MapnificentPosition.prototype.workerMessage = function() {
       self.stationMap = event.data.stationMap;
       self.debugMap = event.data.debugMap;
       self.mapnificent.redraw();
-      self.mapnificent.signal_done();
+      self.mapnificent.signal_worker_done();
     }
   };
 };
@@ -284,8 +284,12 @@ MapnificentPosition.prototype.destroy = function(){
 function Mapnificent(map, city, pageConfig){
   this.map = map;
   this.positions = [];
-  this.time = 60 * 10;
+  
   this.circles = [];
+  this.estates = {};
+  this.layer_estates = null;
+
+  this.time = 60 * 10;
   // FIXME: this is messy
   this.city = city;
   this.settings = $.extend({
@@ -347,33 +351,52 @@ Mapnificent.prototype.init = function(){
         ));
       }
     }
-    
+    self.layer_estates = L.layerGroup();
+    self.control = L.control.layers();
+    self.control.addOverlay(self.layer_estates, "Estates");
+    self.map.addControl(self.control);
+    self.map.addLayer(self.layer_estates);
     console.log("Mapnificent.prototype.init FINISHED");
   });
 };
 
-Mapnificent.prototype.signal_done = function() {
-console.log("SIGNAL_DONE");
-  var self = this
+Mapnificent.prototype.signal_worker_done = function() {
+  var self = this;
+  self.get_estates();
+}
+
+Mapnificent.prototype.get_estates = function() {
+  console.log("get_states");
+  var self = this;
   var url = "http://localhost:5000/";
-  
   var websites = [
-    "sreality",
+    "sreality"
     //"bezrealiky"
   ];
-  for (var website in websites){
-    var request = url +  websites[website];
+
+  for (var i in websites){
+    self.estates[websites[i]] = {};
+    var request = url +  websites[i];
     fetch(request)
       .then(response => response.text())
-      .then(data => self.add_estates(JSON.parse(data)))
-      .catch(error => console.log('Error', error));  
+      //.then(data => self.estates[websites[i]] = JSON.parse(data))
+      .then(function(data) {
+        self.estates[websites[i]] = JSON.parse(data);
+        self.add_estates(websites[i]);
+      })
+      .catch(error => console.log('Error get_states: ', error));  
   }
 }
 
-Mapnificent.prototype.add_estates = function(estates) {
+Mapnificent.prototype.add_estates = function(website) {
+  console.log("ADDDDDDDDDDDDDD ESTATES");
   var old_time = new Date();
   var self = this;
-  console.log(estates.length);
+  var estates = self.estates[website];
+  console.log("Estates: ", self.estates);
+  console.log("website: ", website);
+  console.log("Estates[website]: ", self.estates[website]);
+  console.log("Circles: ", self.circles);
   for (var i in estates) {
     var gps = estates[i]['gps'];
     var url = estates[i]['url'];
@@ -389,14 +412,22 @@ Mapnificent.prototype.add_estates = function(estates) {
         var popup = new L.Popup({minWidth: 800});
         var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
         popup.setContent(preview);
-        marker.bindPopup(popup).addTo(self.map);
-        //self.cities_layer.addLayer(marker);
+        marker.bindPopup(popup).addTo(self.layer_estates);
+        console.log("ADDING MARKER");
         break;
       }
     }
   }
+  self.redraw();
   self.circles = [];
   console.log("Time: ", new Date() - old_time);
+}
+
+Mapnificent.prototype.remove_estates = function() {
+  var self = this;
+  self.estates = {};
+  self.layer_estates.clearLayers();
+  self.circles = [];
 }
 
 Mapnificent.prototype.logDebugMessage = function(latlng) {

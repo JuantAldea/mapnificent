@@ -318,16 +318,16 @@ Mapnificent.prototype.init = function(){
   var self = this, t0;
   self.tilesLoading = false;
   return this.loadData().done(function(data){
-      self.prepareData(data);
-      self.canvasTileLayer = L.tileLayer.canvas();
-      self.canvasTileLayer.on('loading', function(){
-        self.tilesLoading = true;
-        t0 = new Date().getTime();
-      });
-      self.canvasTileLayer.on('load', function(){
-        self.tilesLoading = false;
-        if (self.needsRedraw) {
-          self.redraw();
+    self.prepareData(data);
+    self.canvasTileLayer = L.tileLayer.canvas();
+    self.canvasTileLayer.on('loading', function(){
+      self.tilesLoading = true;
+      t0 = new Date().getTime();
+    });
+    self.canvasTileLayer.on('load', function(){
+      self.tilesLoading = false;
+      if (self.needsRedraw) {
+        self.redraw();
       }
       self.redrawTime = (new Date().getTime()) - t0;
       console.log('reloading tile layer took', self.redrawTime, 'ms');

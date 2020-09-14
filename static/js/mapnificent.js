@@ -289,7 +289,7 @@ MapnificentPosition.prototype.destroy = function(){
 function Mapnificent(map, city, pageConfig){
   this.map = map;
   this.positions = [];
-  
+
   this.circles = [];
   this.estates = {};
   this.layer_estates = null;
@@ -317,13 +317,13 @@ function Mapnificent(map, city, pageConfig){
 Mapnificent.prototype.init = function(){
   var self = this, t0;
   self.tilesLoading = false;
-  
+
   return this.loadData().done(
     function(data){
       self.prepareData(data);
-     
+
       self.canvasTileLayer = L.tileLayer.canvas();
-      
+
       self.canvasTileLayer.on('loading', function(){
         self.tilesLoading = true;
         t0 = new Date().getTime();
@@ -341,15 +341,15 @@ Mapnificent.prototype.init = function(){
 
     self.canvasTileLayer.drawTile = self.drawTile();
     self.map.addLayer(self.canvasTileLayer);
-    
-/* 
+
+/*
    self.map.on('click', function(e) {
         self.addPosition(e.latlng);
     });
 */
     self.map.on('contextmenu', function(e) {
       if (self.settings.debug) {
-        self.logDebugMessage(e.latlng);
+        //self.logDebugMessage(e.latlng);
       }
     });
     self.augmentLeafletHash();
@@ -364,14 +364,14 @@ Mapnificent.prototype.init = function(){
     }
     self.layer_estates = L.layerGroup();
     self.map.addLayer(self.layer_estates);
-    
+
     self.layer_stops = L.layerGroup();
     self.map.addLayer(self.layer_stops);
 
     self.control = L.control.layers();
     self.control.addOverlay(self.layer_estates, "Estates");
     self.control.addOverlay(self.layer_stops, "Stops");
-    
+
     self.map.addControl(self.control);
     console.log("Mapnificent.prototype.init FINISHED");
   });
@@ -406,7 +406,7 @@ Mapnificent.prototype.get_estates = function() {
   }
   return Promise.all(promises);
 }
-
+/*
 Mapnificent.prototype.add_estates = function(website) {
   console.log("ADDDDDDDDDDDDDD ESTATES");
   var old_time = new Date();
@@ -424,20 +424,29 @@ Mapnificent.prototype.add_estates = function(website) {
     //  var circle = self.circles[i];
     //  var distance = self.quadtree.distanceBetweenCoordinates(latlon[0], latlon[1], circle[0], circle[1]);
     //  if(distance <= circle[2]){
-        var marker = new L.Marker(latlon, {
-          draggable: false, 
-          opacity: 0.5
-        });
-        var popup = new L.Popup({minWidth: 800});
+
         var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
-        popup.setContent(preview);
-        marker.bindPopup(popup).addTo(self.layer_estates);
+        this.add_marker(latlon, preview);
         //console.log("ADDING MARKER");
     //    break;
     //  }
     //}
   }
   console.log("Time: ", new Date() - old_time);
+}
+*/
+Mapnificent.prototype.add_marker = function(latlon, preview) {
+  var self = this;
+  return function(){
+    var marker = new L.Marker(latlon, {
+      draggable: false,
+      opacity: 0.5
+    });
+    var popup = new L.Popup({minWidth: 800});
+
+    popup.setContent(preview);
+    marker.bindPopup(popup).addTo(self.layer_estates);
+  };
 }
 
 Mapnificent.prototype.add_estates2 = function(website) {
@@ -448,7 +457,6 @@ Mapnificent.prototype.add_estates2 = function(website) {
   console.log("Estates: ", self.estates);
   console.log("website: ", website);
   console.log("Estates[website]: ", self.estates[website]);
-  console.log("Circles: ", self.circles);
   var maxWalkTime = this.settings.maxWalkTime;
   var secondsPerKm = this.settings.secondsPerKm;
   var maxWalkDistance = maxWalkTime * (1 / secondsPerKm) * 1000;
@@ -460,45 +468,85 @@ Mapnificent.prototype.add_estates2 = function(website) {
     var latlon = [gps['lat'], gps['lon']];
     var stationsAround = self.quadtree.searchInRadius(gps['lat'], gps['lon'], maxWalkDistance);
     console.log("stationsAround", stationsAround);
+    var min = 100000;
+    var min_walk_time = 100000;
+    var i_min = -1;
     for (var i = 0; i < stationsAround.length; i += 1) {
       var stationTime = self.positions[0].stationMap[stationsAround[i].id];
       if (stationTime === undefined || stationTime >= self.positions[0].time) {
         continue;
       }
       var time_left = Math.min(self.positions[0].time - stationTime, maxWalkTime);
-      
+
       var distance = self.quadtree.distanceBetweenCoordinates(stationsAround[i].lat, stationsAround[i].lng, gps['lat'], gps['lon']);
 
       var walkable_on_time_left = time_left * (1 / secondsPerKm) * 1000;
+
+      console.log("secondsPerKm", secondsPerKm);
 
       //console.log(i, " Time:", self.positions[0].time, " Station time: ", stationTime, " distance: ", distance, " Time left:", time_left, " walkable_on_time_left: ", walkable_on_time_left, " Valid: ", walkable_on_time_left >= distance);
       if (walkable_on_time_left < distance){
         continue;
       }
-      console.log("PREMIADA: ", stationsAround[i]);
+      var total_time = stationTime + (distance * secondsPerKm / 1000.0);
       stations.push(stationsAround[i]);
+      if (total_time < min){
+        min = total_time;
+        min_walk_time = (distance * secondsPerKm / 1000.0);
+        i_min = i;
+      }
+      /*
       var marker = new L.Marker(latlon, {
-          draggable: false, 
+          draggable: false,
           opacity: 0.5
         });
         var popup = new L.Popup({minWidth: 800});
         var preview = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
         popup.setContent(preview);
         marker.bindPopup(popup).addTo(self.layer_estates);
-
+*/
+        var preview1 = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
+        this.add_marker(latlon, preview1)();
+       /*
         var marker2 = new L.Marker([stationsAround[i].lat, stationsAround[i].lng], {
-          draggable: false, 
+          draggable: false,
           opacity: 0.5
         });
         var popup2 = new L.Popup({minWidth: 20});
         var preview2 = "<p>Station: " + (stationTime / 60.0) + "</p>";
         popup2.setContent(preview2);
         marker2.bindPopup(popup2).addTo(self.layer_stops);
-        break;
+        */
+        //var preview2 = "<p>Station: " + stationsAround[i].Name + ", " + (stationTime / 60.0) + "</p>";
+        //this.add_marker([stationsAround[i].lat, stationsAround[i].lng], preview2)();
     }
+
+    if (i_min == -1){
+      continue;
+    }
+
+    var preview1 = "<a target='_blank' href='" + url + "'> link </a>" + "<div class='box'><iframe src='" + url + "'width = '800px' height = '500px'></iframe></div>";
+    this.add_marker(latlon, preview1)();
+    //var preview2 = "<p>Station: " + stationsAround[i_min].Name + ", " + (min / 60.0) + "</p>";
+    //this.add_marker([stationsAround[i_min].lat, stationsAround[i_min].lng], preview2)();
+    console.log("PREMIADA MIN: ", stationsAround[i_min]);
+
+    console.log("MAP: ",  self.positions[0].stationMap[stationsAround[i_min].id]);
+    console.log("Time min: ", min);
+    console.log("Time walk: ", min_walk_time);
     console.log("stations: ", stations);
   }
+
   console.log("Time: ", new Date() - old_time);
+}
+
+Mapnificent.prototype.route = function(i)
+{
+  //aqui hubo una funcion una vez
+  //self.positions[0].stationMap[stationsAround[i].id]);
+  var preview2 = "<p>Station: " + stationsAround[i_min].Name + ", " + (min / 60.0) + "</p>";
+  this.add_marker([stationsAround[i_min].lat, stationsAround[i_min].lng], preview2)();
+
 }
 
 Mapnificent.prototype.remove_estates = function() {
@@ -507,8 +555,14 @@ Mapnificent.prototype.remove_estates = function() {
 }
 
 Mapnificent.prototype.logDebugMessage = function(latlng) {
+  console.log("logDebugMessage");
   var self = this;
   var stationsAround = this.quadtree.searchInRadius(latlng.lat, latlng.lng, 30000);
+  console.log("logDebugMessage ", stationsAround);
+  stationsAround.forEach(function(station, i){
+    //self.add_marker([station.Latitude, station.Longitude], station.Name)();
+  });
+  return;
   this.positions.forEach(function(pos, i){
     console.log('Position ', i);
     if (pos.debugMap === undefined) {
@@ -718,7 +772,6 @@ Mapnificent.prototype.drawTile = function() {
         ctx.arc(drawStations[j].x, drawStations[j].y,
                 drawStations[j].r, 0, 2 * Math.PI, false);
         ctx.fill();
-        //self.circles.push([drawStations[j].lat, drawStations[j].lng, drawStations[j].radius_m]);
       }
     }
   };

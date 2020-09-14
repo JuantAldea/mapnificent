@@ -15,12 +15,12 @@ sreality_url = "https://www.sreality.cz/api/en/v2/estates?"\
 "&czk_price_summary_order2=0|20000"\
 "&locality_district_id=5001|5002|5003|5004|5005|5006|5007|5008|5009|5010"\
 "&locality_region_id=10"\
-"&per_page=1"\
+"&per_page=200"\
 "&usable_area=40|10000000000"
 #"&furnished=1"\
 
 @app.route("/sreality")
-@cache.cache("sreality", expire=300)
+@cache.cache("sreality", expire=10)
 def sreality():
     print(sreality_url)
     #url = "https://www.sreality.cz/api/en/v2/estates?building_condition=1%7C2%7C6%7C9&category_main_cb=1&category_sub_cb=2%7C3%7C4%7C5%7C6%7C7&category_type_cb=2&czk_price_summary_order2=0%7C20000&locality_district_id=5001%7C5002%7C5004%7C5003%7C5005%7C5006%7C5007%7C5008%7C5009%7C5010&locality_region_id=10&per_page=999&tms=1510159751265&usable_area=45%7C10000000000"
@@ -41,6 +41,7 @@ def sreality():
             estate_id)
         results.append({"url": estate_url, "gps": gps})
         results = sorted(results, key= lambda x: x['gps']['lat'])
+        print(results)
     return jsonify(results)
 
 
@@ -60,7 +61,7 @@ def bezrealiky():
     }
 
     data = '{"action":"map","squares":"[\\"{\\\\\\"swlat\\\\\\":48,\\\\\\"swlng\\\\\\":12,\\\\\\"nelat\\\\\\":50,\\\\\\"nelng\\\\\\":16}\\",\\"{\\\\\\"swlat\\\\\\":50,\\\\\\"swlng\\\\\\":12,\\\\\\"nelat\\\\\\":52,\\\\\\"nelng\\\\\\":16}\\"]","filter":{"order":"time_order_desc","advertoffertype":"nabidka-pronajem","estatetype":["byt","dum"],"disposition":[],"ownership":"","equipped":"","priceFrom":null,"priceTo":null,"construction":"","description":"","surfaceFrom":"","surfaceTo":"","balcony":"","terrace":"","polygons":[[{"lat":50.241935486043715,"lng":14.192962646484375},{"lat":50.27266552996841,"lng":14.271240234375},{"lat":50.27003230289287,"lng":14.695587158203125},{"lat":50.26037589105958,"lng":14.780731201171875},{"lat":50.23930055989883,"lng":14.868621826171875},{"lat":50.18041592143885,"lng":14.929046630859375},{"lat":50.09856007224113,"lng":14.937286376953125},{"lat":50.01656412776064,"lng":14.920806884765625},{"lat":49.95033627078014,"lng":14.86724853515625},{"lat":49.91674601684011,"lng":14.788970947265625},{"lat":49.90171121726089,"lng":14.703826904296875},{"lat":49.90171121726089,"lng":14.621429443359375},{"lat":49.90171121726089,"lng":14.539031982421875},{"lat":49.90171121726089,"lng":14.445648193359375},{"lat":49.91055578459882,"lng":14.360504150390625},{"lat":49.92558782740072,"lng":14.27947998046875},{"lat":49.95828842806968,"lng":14.192962646484375},{"lat":50.0227407426766,"lng":14.129791259765625},{"lat":50.11001070896015,"lng":14.121551513671875},{"lat":50.191846980704504,"lng":14.143524169921875},{"lat":50.241935486043715,"lng":14.192962646484375},{"lat":50.241935486043715,"lng":14.192962646484375},{"lat":50.241935486043715,"lng":14.192962646484375}]]}}'
-    
+
     response = requests.post('https://www.bezrealitky.cz/api/search/map', headers=headers, data=data)
     estates = response.json()['squares'][1]['records']
 
@@ -69,6 +70,7 @@ def bezrealiky():
         estate_url = "https://www.bezrealitky.cz/{}".format(estates[idx]['url'])
         estate_gps = {'lat': estates[idx]['lat'], 'lon' : estates[idx]['lng']}
         json_results[str(idx)] = {"url": estate_url, "gps" : estate_gps}
+    print(results)
     return jsonify(json_results)
 
 

@@ -42,7 +42,6 @@ MapnificentPosition.prototype.init = function(){
   this.marker.on('dragend', function(){
     self.updatePosition(self.marker.getLatLng());
   });
-
   this.startCalculation();
 };
 

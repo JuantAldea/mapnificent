@@ -317,9 +317,7 @@ function Mapnificent(map, city, pageConfig){
 Mapnificent.prototype.init = function(){
   var self = this, t0;
   self.tilesLoading = false;
-
-  return this.loadData().done(
-    function(data){
+  return this.loadData().done(function(data){
       self.prepareData(data);
       self.canvasTileLayer = L.tileLayer.canvas();
       self.canvasTileLayer.on('loading', function(){

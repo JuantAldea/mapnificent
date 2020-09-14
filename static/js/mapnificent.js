@@ -334,9 +334,7 @@ Mapnificent.prototype.init = function(){
 
     self.canvasTileLayer.drawTile = self.drawTile();
     self.map.addLayer(self.canvasTileLayer);
-
-
-   self.map.on('click', function(e) {
+    self.map.on('click', function(e) {
         self.addPosition(e.latlng);
     });
 

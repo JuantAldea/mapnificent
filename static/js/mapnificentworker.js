@@ -220,7 +220,7 @@ var mapnificentWorker = (function(undefined) {
       intervalKey = event.data.intervalKey,
       debug = event.data.debug,
       optimizedLines = {};
-
+      debug= true;
     if (debug) {
       debugMap = {};
     }

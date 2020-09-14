@@ -89,6 +89,8 @@ layout: base
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/gokertanrisever/leaflet-ruler/master/src/leaflet-ruler.css">
+<script src="https://cdn.rawgit.com/gokertanrisever/leaflet-ruler/master/src/leaflet-ruler.js"></script>
 
 <script src="{{ site.baseurl }}/static/vendor/leaflet/dist/leaflet.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ site.baseurl }}/static/vendor/leaflet-hash/leaflet-hash.js" type="text/javascript" charset="utf-8"></script>
@@ -122,19 +124,14 @@ $(function(){
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
   });
 
-  
-  
   map.attributionControl.setPrefix("");
   map.addLayer(defaultTileLayer);
-  //var cities_layer = new L.layerGroup();
-  //map.addControl(L.control.layers({}, {"Estates": cities_layer}));
 
   var mapnificent = new Mapnificent(map, city, {
     baseurl: '{{ site.baseurl }}/',
   });
-  
-  mapnificent.init();
 
+  mapnificent.init();
 });
 
 </script>
